@@ -1,5 +1,4 @@
 
-
 function isArray(myArray) {
     return Array.isArray(myArray);
 }
@@ -44,7 +43,5 @@ const serialize = (data) => {
         default: return new Error('Unsupported datatype');
     }
 };
-
-console.log(serialize([1, 2, 'Huss', 3, 'OK']));
 
 module.exports = serialize;
