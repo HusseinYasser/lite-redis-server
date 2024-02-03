@@ -1,4 +1,3 @@
-const { parse } = require("path");
 
 const parseSimpleString = (data) => {
     return content.trim();
@@ -51,7 +50,7 @@ const parseArray = (arr, start, length) => {
     }
     if(length == 0)
     {
-        return {array: res, end: i};
+        return {array: res, end: arr.length};
     }
     return new Error('Wrong Input Format');
 };
@@ -76,5 +75,6 @@ const desarilize = (data) => {
 message = '*2\r\n*3\r\n:1\r\n:2\r\n:3\r\n*2\r\n+Hello\r\n-World\r\n'
 
 //message = '*2\r\n$4\r\necho\r\n$11\r\nhello world\r\n'
-console.log(desarilize(message))
+//console.log(desarilize(message))
 
+module.exports = desarilize;

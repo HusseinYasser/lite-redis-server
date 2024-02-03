@@ -12,7 +12,7 @@ const desarilize = (data) => {
 
 };
 
-const takeAction = (command)=>{
+const takeAction = (command) => {
     return undefined;
 }
 
