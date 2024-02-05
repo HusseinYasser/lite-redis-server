@@ -69,11 +69,4 @@ class Node {
 
   module.exports = LinkedList;
   
-  const linkedList = new LinkedList();
-  
-  linkedList.appendRight(1);
-  linkedList.appendRight(2);
-  linkedList.appendLeft(3);
-  
-  console.log(linkedList.lrange(0, -4));
   

@@ -6,7 +6,7 @@ const desarilize  = require('./deserializer.js');
 
 const LinkedList = require('./linkedlist.js');
 
-const map = {};
+const map = new Map();
 
 const echo = (data) => {
     return data;
@@ -17,100 +17,99 @@ const ping = () => {
 };
 
 const set = (key, val, expiry) => {
-    map[key] = val;
-    if(expiry !== undefined)
-    {
-        map[key] = {
-            value: val,
-            expiry: expiry
-        };
-    }
+    
+    map.set(key, {
+        value: val,
+        expiry: expiry
+    });
     return 'OK';
 };
 
 const get = (key) => {
-    if(map[key] === undefined)
+    if(!map.has(key)) return null;
+
+    let obj = map.get(key);
+    expiry = obj.expiry;
+
+        //check if it is expired or not
+    if(expiry && new Date().getTime() > expiry)
     {
+        map.delete(key);
         return null;
     }
-    expiry = map[key].expiry;
-    if(expiry)
-    {
-        //check if it is expired or not
-        if(new Date().getTime() > expiry)
-        {
-            delete map[key];
-            return null;
-        }
-        else{
-            if(map[key] instanceof LinkedList) return new Error("Arrays are not simple datatype, use LRANEG instead");
-            return map[key].value;
-        }
+    else{
+        //if(obj.value instanceof LinkedList) return new Error("Arrays are not simple datatype, use LRANEG instead");
+        return obj.value;
     }
-    if(map[key] instanceof LinkedList) return new Error("Arrays are not simple datatype, use LRANEG instead");
-    return  map[key];
 };
 
 const exists = (keys) => {
     return keys.reduce((cum, key) => {
-        return cum + ((map[key] === undefined)? 0:1);
+        return cum + ( map.has(key) ? 1:0);
     }, 0);
 };
 
 const del = (keys) => {
     return keys.reduce((cum, key) => {
-        let add = ((map[key] === undefined)? 0:1);
-        delete map[key];
+        let add = ( map.has(key) ? 1:0);
+        map.delete(key);
         return cum + add;
     }, 0);
 }
 
 const incr = (key, i) => {
-    if(map[key] === undefined)
+    if(!map.has(key))
     {
-        map[key] = '0';
+        map.set(key, {
+            value: '0',
+            expiry: undefined
+        });
     }
-    let val = parseInt(map[key]);
+    let val = parseInt(map.get(key).value);
     if(val === undefined)
     {
         return new Error("Value of this key can't be represented as integer");
     }
+    let expir = map.get(key).expiry; 
     val += i;
-    map[key] = val.toString();
+    map.set(key,  {value: val.toString(), expiry: expir});
     return val;
 };
 
 const push = (key, values, isLeft) => {
-    if(map[key] === undefined)
+    if(!map.has(key))
     {
         //new element
-        map[key] = new LinkedList();
+        map.set(key, {
+            value: new LinkedList(),
+            expiry: undefined
+        }); 
     }
-    if(!(map[key] instanceof LinkedList))
+    if(!(map.get(key).value instanceof LinkedList))
     {
         return new Error("The datatype stored is not copmpatible with this command");
     }
     values.forEach((val) => 
     {
         if(isLeft)
-            map[key].appendLeft(val);
+            map.get(key).value.appendLeft(val);
         else
-            map[key].appendRight(val);
+            map.get(key).value.appendRight(val);
     });
-    return map[key].size;
+    return map.get(key).value.size;
 };
 
 
 const lrange = (key, start, end) => {
-    if(map[key] === undefined) return [];
-    if(!(map[key] instanceof LinkedList))
+    if(!map.has(key)) return [];
+    if(!(map.get(key).value instanceof LinkedList))
     {
         return new Error("The datatype stored is not copmpatible with this command");
     }
     start = parseInt(start);
     end = parseInt(end);
     if(start === undefined || end === undefined) return new Error("The start and end should be integers");
-    return map[key].lrange(start, end);
+    return map.get(key).value.lrange(start, end);
 }
 
 
@@ -245,6 +244,6 @@ const handleClient = (client) => {
 
 server = net.createServer(handleClient);
 
-server.listen(6380, '127.0.0.1', () => {
-    console.log('Redis Lite server listening on 127.0.0.1:6380');
+server.listen(6379, '127.0.0.1', () => {
+    //console.log('Redis Lite server listening on 127.0.0.1:6380');
 });

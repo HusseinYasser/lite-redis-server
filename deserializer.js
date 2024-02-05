@@ -72,7 +72,7 @@ const desarilize = (data) => {
 
 };
 
-message = '*2\r\n*3\r\n:1\r\n:2\r\n:3\r\n*2\r\n+Hello\r\n-World\r\n'
+//message = '*2\r\n*3\r\n:1\r\n:2\r\n:3\r\n*2\r\n+Hello\r\n-World\r\n'
 
 //message = '*2\r\n$4\r\necho\r\n$11\r\nhello world\r\n'
 //console.log(desarilize(message))
