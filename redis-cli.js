@@ -3,7 +3,8 @@ const readline = require('readline');
 const kleur = require('kleur');
 const serializer = require('./serializer.js');
 const deserializer = require('./deserializer.js');
-const help = require('./help.js');
+const {help, getCommand, readCommandFile} = require('./help.js');
+
 
 const hostIndex = process.argv.indexOf('-h');
 const portIndex = process.argv.indexOf('-p');
@@ -50,20 +51,37 @@ const showData = (data) => {
     }
 };
 
+
+
+
 const client = net.createConnection({
     host: host,
     port: port 
 },
 () => 
 {
+    process.stdin.setRawMode(true);
     // Start reading user input
     const rl = readline.createInterface({
         input: process.stdin,
-        output: process.stdout
+        output: process.stdout,
+        completer: hint_completer
     });
 
-    rl.setPrompt(`${host}:${port}>`);
-    rl.prompt();
+    function hint_completer(line) {
+        let originalLine = line;
+        line = line.split(' ');
+        const jsonData = readCommandFile(line[0].toLowerCase().trim());
+        let command = getCommand(line[0].trim(), jsonData);
+        console.log(command.slice(line.length - 1).join(' '));
+        rl.line = '';
+        rl.prompt();
+        return [[], originalLine];
+    };
+    
+
+    rl.setPrompt(kleur.green('he_') + `${host}:${port}>`);
+    rl.prompt();    
 
     rl.on('line', (inputData) => {
         if(inputData.toLowerCase().trim() === 'exit')
@@ -96,9 +114,6 @@ const client = net.createConnection({
 
     client.on('end', () => {
         process.exit();
-    })
-
-
-    
+    });
 }
 );

@@ -23,43 +23,45 @@ const helpArgument = (arg) => {
     }
     if(arg.optional)
         ans += ']';
-
     
     return kleur.grey(ans);
 };
 
-const helpAction = (actionName, json) => {
-    let ans = '';
+const getCommand = (actionName, json) => {
+    let command = [];
     actionName = actionName.toUpperCase();
-    ans += actionName.toUpperCase() + ' ';
+    command.push(actionName);
+    
     //arguments
-    if(json[actionName].arguments){
+    if(json[actionName] && json[actionName].arguments){
         json[actionName].arguments.forEach(element => {
-            ans += helpArgument(element);
+            command.push( helpArgument(element) );
         });
     }
-    ans += '\n';
+    return command;
+};
+
+const helpAction = (actionName, json) => {
+    let ans = '\n';
+    actionName = actionName.toUpperCase();
+    ans += getCommand(actionName, json).join(' ') + '\n';
     ans += kleur.yellow('summary:') + ' ' + json[actionName].summary + '\n';
     ans += kleur.yellow('since:') + ' ' + json[actionName].since + '\n';
     ans += kleur.yellow('group:') + ' ' + json[actionName].group + '\n';
     return ans;
 };
 
-const help = (data) => {
-    let command_name = data.toLowerCase().trim();
-    if(command_name === '')
-        return 'hy-cli\nTo get help about Redis commands type:\n"help <command>" for help on <command>\n"exit" to exit';
-    
+const readCommandFile = (data) => {
+
     const actionPath = path.resolve(__dirname, `./help_commands/${data}.json`);
 
     if (fs.existsSync(actionPath)) 
     { 
         try {
             const file = fs.readFileSync(actionPath, 'utf8');
-            
-            const jsonData = JSON.parse(file);
-            return helpAction(command_name, jsonData);
-                
+
+            return JSON.parse(file);
+
         } catch (parseError) {
             console.error('Error parsing JSON:', parseError);
         }
@@ -70,4 +72,12 @@ const help = (data) => {
     }
 };
 
-module.exports = help;
+const help = (data) => {
+    let command_name = data.toLowerCase().trim();
+    if(command_name === '')
+        return '\nhy-cli\nTo get help about Redis commands type:\n"help <command>" for help on <command>\n"exit" to exit\n';
+    
+    return helpAction(command_name, readCommandFile(command_name));
+};
+
+module.exports = {help, getCommand, readCommandFile};
