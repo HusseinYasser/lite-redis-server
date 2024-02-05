@@ -128,6 +128,10 @@ const takeAction = (command) => {
             let currentUnixTimeSeconds;
             let seconds;
             let milliseconds;
+            if(command.length < 3)
+            {
+                return new Error('Insufficient number of arguments');
+            }
             if(command.length > 3)
             {
                 if(command.length == 4 || command.length > 5)
@@ -204,7 +208,6 @@ const takeAction = (command) => {
             {
                 return new Error("This command takes only one argument.");
             }
-
             return (command[0].toLowerCase() == 'incr')? incr(command[1], 1):incr(command[1], -1);
         
         case 'lpush':
@@ -244,6 +247,4 @@ const handleClient = (client) => {
 
 server = net.createServer(handleClient);
 
-server.listen(6379, '127.0.0.1', () => {
-    //console.log('Redis Lite server listening on 127.0.0.1:6380');
-});
+server.listen(6379, '127.0.0.1');

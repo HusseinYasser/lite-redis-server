@@ -6,8 +6,13 @@ const serializer = require('./serializer.js');
 
 const deserializer = require('./deserializer.js');
 
-let host = '127.0.0.1';
-let port = 6379;
+const help = require('./help.js');
+
+const hostIndex = process.argv.indexOf('-h');
+const portIndex = process.argv.indexOf('-p');
+
+const host = hostIndex !== -1 ? process.argv[hostIndex + 1] : 'localhost';
+const port = portIndex !== -1 ? parseInt(process.argv[portIndex + 1], 10) : 6379;
 
 const showList = (data, spaces) => {
     let i = 1;
@@ -33,6 +38,10 @@ const showData = (data) => {
     {
         //integer data
         return `(integer) ${data}`;
+    }
+    else if(data instanceof Error)
+    {
+        return `(error) ${data.message}`;
     }
     else if(Array.isArray(data))
     {
@@ -69,8 +78,15 @@ const client = net.createConnection({
         else
         {
             inputData = inputData.split(' ');
-            let serializedData = serializer(inputData);
-            client.write(serializedData);
+            if(inputData[0].toLowerCase() === 'help')
+            {
+                console.log(help(inputData.slice(1).join(' ')));
+                rl.prompt();
+            }
+            else{
+                let serializedData = serializer(inputData);
+                client.write(serializedData);
+            }
         }
     });
 
