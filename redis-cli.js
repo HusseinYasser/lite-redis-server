@@ -1,11 +1,8 @@
 const net = require('net');
-
 const readline = require('readline');
-
+const kleur = require('kleur');
 const serializer = require('./serializer.js');
-
 const deserializer = require('./deserializer.js');
-
 const help = require('./help.js');
 
 const hostIndex = process.argv.indexOf('-h');
@@ -34,14 +31,14 @@ const showList = (data, spaces) => {
 };
 
 const showData = (data) => {
-    if(typeof(data) === 'Number' )
+    if(typeof(data) === 'number' )
     {
         //integer data
-        return `(integer) ${data}`;
+        return kleur.blue('(integer)') + ` ${data}`;
     }
     else if(data instanceof Error)
     {
-        return `(error) ${data.message}`;
+        return kleur.red('(error)') + ` ${data.message}`;
     }
     else if(Array.isArray(data))
     {
@@ -96,6 +93,10 @@ const client = net.createConnection({
         console.log(showData(desarilizedData));
         rl.prompt();
     });
+
+    client.on('end', () => {
+        process.exit();
+    })
 
 
     

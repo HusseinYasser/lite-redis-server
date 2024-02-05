@@ -13,9 +13,6 @@ const helpArgument = (arg) => {
             return `${element.token} ${element.name}`;
         }).join(seperator);
     }
-    if(arg.optional)
-        ans += ']';
-
     if(!arg.arguments)
     {
         ans += arg.name + ' ';
@@ -24,6 +21,10 @@ const helpArgument = (arg) => {
             ans += `[${arg.name} ...]`;
         }
     }
+    if(arg.optional)
+        ans += ']';
+
+    
     return kleur.grey(ans);
 };
 
