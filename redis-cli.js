@@ -70,10 +70,10 @@ const client = net.createConnection({
 
     function hint_completer(line) {
         let originalLine = line;
-        line = line.split(' ');
+        line = line.trim().split(' ');
         const jsonData = readCommandFile(line[0].toLowerCase().trim());
         let command = getCommand(line[0].trim(), jsonData);
-        console.log(command.slice(line.length - 1).join(' '));
+        console.log(' ' + command.slice(line.length).join(' '));
         rl.line = '';
         rl.prompt();
         return [[], originalLine];
