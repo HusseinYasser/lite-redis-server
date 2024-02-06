@@ -35,7 +35,7 @@ The he-CLI serializes and desrializes the commands to/from RESP before sending t
 To Run Lite Redis Server, follow these steps:
 
 ```bash 
-$ git clone https://github.com/HusseinYasser/lite-redis.git
+$ git clone https://github.com/HusseinYasser/lite-redis-server.git
 $ cd lite-redis
 $ node redis
 ```
